@@ -25,8 +25,8 @@ export default class BabylonEngine {
         /** @type BABYLON.Camera */
         this.camera = null;
 
-        /** @type BABYLON.Light */
-        this.light = null;
+        /** @type Object */
+        this.lights = {};
 
         this.initEngine();
 
@@ -34,7 +34,6 @@ export default class BabylonEngine {
         if (config.get("exampleCamera")) {
             this.initExampleCamera();
         }
-
         if (config.get("exampleLight")) {
             this.initExampleLight();
         }
@@ -65,7 +64,7 @@ export default class BabylonEngine {
     }
 
     initExampleLight() {
-        this.light = new BABYLON.HemisphericLight("Light1", new BABYLON.Vector3(1, 1, 0), this.scene);
+        this.lights.hemispheric = new BABYLON.HemisphericLight("Light1", new BABYLON.Vector3(1, 1, 0), this.scene);
     }
 
     static fetchConfig() {
