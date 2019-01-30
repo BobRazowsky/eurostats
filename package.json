@@ -1,7 +1,7 @@
 {
-  "name": "starter",
+  "name": "starter-3d",
   "version": "0.1.0",
-  "description": "Obsidian Starter Kit",
+  "description": "Obsidian Starter Kit 3D",
   "main": "src/index.js",
   "scripts": {
     "start": "node server",
@@ -59,10 +59,7 @@
     "webpack-cli": "^3.0.7",
     "webpack-dev-middleware": "^3.2.0",
     "webpack-glsl-loader": "^1.0.1",
-    "webpack-merge": "^4.1.3",
-    "vue": "^2.5.22",
-    "vue-loader": "^15.6.2",
-    "vue-template-compiler": "^2.5.22"
+    "webpack-merge": "^4.1.3"
   },
   "dependencies": {
     "express": "^4.16.3"
