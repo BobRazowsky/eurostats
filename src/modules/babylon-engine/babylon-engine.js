@@ -51,7 +51,11 @@ export default class BabylonEngine {
      * Launch the render loop and handle engine resize
      */
     initEngine() {
-        this.engine.runRenderLoop(() => this.loop());
+        // this.engine.runRenderLoop(() => this.loop());
+        self.app.modules.mainLoop.addCallback(() => {
+            this.loop();
+        });
+        self.app.modules.mainLoop.start();
         window.addEventListener("resize", () => {
             this.engine.resize();
         });

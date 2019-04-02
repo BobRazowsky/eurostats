@@ -2,7 +2,7 @@ export default {
 
     name: "babylon-engine",
 
-    requires: [],
+    requires: ["main-loop"],
 
     load() {
         const BabylonEngine = require("./babylon-engine").default;

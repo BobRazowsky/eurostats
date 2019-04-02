@@ -8,6 +8,9 @@ infrastructure.
 
 Upstream repository url: `git@github.com:wanadev/obsidianjs-starter.git`
 
+```
+npm install
+```
 ---
 
 ## Useful links :

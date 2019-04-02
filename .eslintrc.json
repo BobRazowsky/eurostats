@@ -10,6 +10,8 @@
   "rules": {
     "quotes": ["error", "double"],
     "indent": ["error", 4],
+    "no-underscore-dangle": "off",
+    "no-plusplus": "off",
     "padded-blocks": [
       "error",
       {
@@ -35,7 +37,8 @@
       }
     ],
     "no-param-reassign": ["error", { "props": false }],
-    "global-require": "off"
+    "global-require": "off",
+    "object-shorthand": "off"
   },
   "overrides": [
     {

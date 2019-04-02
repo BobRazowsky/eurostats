@@ -8,15 +8,14 @@ import self from "./index";
 const Torus = {
 
     /**
-    * @type BABYLON.Scene
-    */
+     * @type BABYLON.Scene
+     */
     scene: self.app.modules.babylonEngine.scene,
 
     Init() {
         // The torus and its material
         const torus = BABYLON.MeshBuilder.CreateTorus(
-            "torus",
-            {
+            "torus", {
                 thickness: 0.5,
                 tessellation: 32,
             },
@@ -38,6 +37,10 @@ const Torus = {
             torus.rotate(BABYLON.Vector3.Left(), 0.01 * ratio);
             torus.rotate(BABYLON.Vector3.Up(), 0.01 * ratio);
         });
+
+
+        // self.app.events.on("@main-loop.update", ({timeSinceLastCall}) => {
+        // });
     },
 
 
