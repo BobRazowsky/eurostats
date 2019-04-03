@@ -28,6 +28,8 @@ export default class BabylonEngine {
         /** @type Object */
         this.lights = {};
 
+        this.mainLoop = self.app.modules.mainLoop;
+
         this.initEngine();
 
         // creates basic camera and light if asked in config
@@ -52,10 +54,10 @@ export default class BabylonEngine {
      */
     initEngine() {
         // this.engine.runRenderLoop(() => this.loop());
-        self.app.modules.mainLoop.addCallback(() => {
+        this.mainLoop.addCallback(() => {
             this.loop();
         });
-        self.app.modules.mainLoop.start();
+        this.mainLoop.start();
         window.addEventListener("resize", () => {
             this.engine.resize();
         });

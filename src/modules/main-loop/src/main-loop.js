@@ -9,73 +9,59 @@ import self from "../index";
 export default class MainLoop {
 
     constructor() {
-        this.callbacks = [];
-        this.enabled = false;
-        this.interval = 0;
+        // Private parameters
+        this._interval = 0;
+        this._currentRequestId = null;
+        this._lastLoopCorrectedTime = window.performance.now();
+        this._lastLoopTime = this._lastLoopCorrectedTime;
 
+        // Public parameters with getter-setters
         this._activeFps = 60;
         this._idleFps = 0;
-        this._wantedDeltaTime = -1;
-        this._currentRequestId = null;
+        this._idle = false;
 
-        // if (config.get("activeFps")) {}
-        this._idle = false; // true = isIdle, false = isActive
+        // Public parameters
+        this.callbacks = [];
+        this.enabled = false;
         this.idleTime = 10000; // time after app goes to idle in milliseconds, -1 is never
-        this.lastLoopTime = 0;
-
-        this.refreshIntervalValue();
-
-
         this.fps = this.activeFps;
-        this.initListeners();
 
+        this.initListeners();
+        this.refreshIntervalValue();
         self.app.events.emit("initialize");
     }
 
     /**
-     * Refresh the wanted time interval between callbacks
+     * Refresh the wanted time _interval between callbacks
      */
     refreshIntervalValue() {
         if (this._idle) {
-            if (this._idleFps > 0) {
-                this.interval = 1000 / this._idleFps;
+            if (this.idleFps > 0) {
+                this._interval = 1000 / this.idleFps;
             } else {
-                this.interval = -1;
+                this._interval = -1;
             }
         } else {
-            this.interval = 1000 / this._activeFps;
+            this._interval = 1000 / this.activeFps;
         }
     }
 
-
+    /**
+     * Window listener : lost of focus management
+     */
     initListeners() {
         window.addEventListener("focus", () => {
             if (this._currentRequestId) {
                 window.cancelAnimationFrame(this._currentRequestId);
             }
             this._loop();
-            this.setIdle(false);
+            this.idle = false;
         }, true);
         window.addEventListener("blur", () => {
-            this.setIdle(true);
+            this.idle = true;
         }, true);
     }
 
-
-    /**
-     * The callbacks
-     *
-     * @property callbacks
-     * @type Function[]
-     * @default []
-     */
-    getCallbacks() {
-        return this.callbacks;
-    }
-
-    setCallbacks(callbacks = []) {
-        this.callbacks = callbacks;
-    }
 
     /**
      * Start the loop.
@@ -128,119 +114,91 @@ export default class MainLoop {
     }
 
     /**
-     * The loop.
-     *
+     * The loop
+     * Inspired by
+     * https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe
      * @method _loop
      * @private
      * @param {Number} timestamp
      */
     _loop(now) {
-        if (this.interval < 0) {
+        if (this._interval < 0) {
             return;
         }
+        // Request animation frame => _loop executed every screen refresh
         this._currentRequestId = requestAnimationFrame(t => this._loop(t));
 
-        const timeSinceLastCall = now - this.lastLoopTime;
+        // We execute the callbacks only if enough time has passed
+        const correctedTimeSinceLastCall = now - this._lastLoopCorrectedTime;
+        if (correctedTimeSinceLastCall > this._interval) {
+            // Get ready for next frame by setting lastTime=now, but...
+            // Also, adjust for interval not being multiple of 16.67
+            this._lastLoopCorrectedTime = now - (correctedTimeSinceLastCall % this._interval);
 
-        if (timeSinceLastCall > this.interval) {
-
+            // actual time, for fps and deltaTime measurement
+            const timeSinceLastCall = now - this.lastLoopTime;
             this.fps = 1000 / timeSinceLastCall;
-            this.lastLoopTime = now - (timeSinceLastCall % this.interval);
-            console.log("fps", this.fps);
+            this.lastLoopTime = now;
 
-
+            // loop events
             self.app.events.emit("update", {
-                deltaTime: timeSinceLastCall,
+                deltaTime: correctedTimeSinceLastCall,
                 fps: this.fps,
                 isIdle: this.isIdle,
             });
 
+            // loop callbacks
             for (let i = 0; i < this.callbacks.length; i++) {
                 try {
                     this.callbacks[i](timeSinceLastCall, this.isIdle);
                 } catch (error) {
-                    console.error(error);
+                    throw Error(error);
                 }
             }
-
         }
-
-        /*
-
-        if (!this.enabled) {
-            return;
-        }
-        let wantedFps;
-        if (this.isIdle === true) {
-            wantedFps = this.idleFps;
-            if (this.idleFps <= 0) {
-                return;
-            }
-        } else {
-            wantedFps = this.activeFps < 0 ? Number.MAX_VALUE : this.activeFps;
-        }
-        const wantedTimeToNextCall = 1000 / wantedFps;
-        const timeSinceLastCall = Date.now() - this.lastLoopTime;
-        // let's compute time we want to wait to suit activeFps (use on settimeout)
-        let delay = wantedTimeToNextCall - timeSinceLastCall;
-        delay = Math.max(0, delay);
-
-
-        this._currentTimeout = setTimeout(() => {
-            const newTime = Date.now();
-            const deltaTime = (newTime - this.lastLoopTime);
-            this.fps = 1000 / deltaTime;
-            console.log("fps", this.fps);
-            this.lastLoopTime = newTime;
-
-            self.app.events.emit("update", {
-                deltaTime: deltaTime,
-                fps: this.fps,
-                isIdle: this.isIdle,
-            });
-
-            for (let i = 0; i < this.callbacks.length; i++) {
-                try {
-                    this.callbacks[i](timeSinceLastCall, this.isIdle);
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-
-            this._loop();
-            //  requestAnimationFrame(() => this._loop());
-
-        }, delay);
-        */
-
     }
 
+
     // -- GETTERS SETTERS ---
-    setActiveFps(activeFps) {
+    /**
+     * Fps when the app is considered as active
+     * To get a constant time interval between frames,
+     * 60 must be a multiple of the fps
+     * @param  {Number} activeFps
+     */
+    set activeFps(activeFps) {
         this._activeFps = activeFps;
         this.refreshIntervalValue();
     }
 
-    getActiveFps() {
+    get activeFps() {
         return this._activeFps;
     }
 
-    setIdleFps(idleFps) {
+    /**
+     * Fps when the app is considered as idle (no focus on windows)
+     * @param  {Number} idleFps
+     */
+    set idleFps(idleFps) {
         this._idleFps = idleFps;
         this.refreshIntervalValue();
     }
 
-    getIdleFps() {
+    get idleFps() {
         return this._idleFps;
     }
 
-    getIdle() {
-        return this._idle;
-    }
-
-    setIdle(isIdle) {
+    /**
+     * Is the app considered as idle
+     * @param  {Boolean} isIdle
+     */
+    set idle(isIdle) {
         this._idle = isIdle;
         this.refreshIntervalValue();
+    }
+
+    get idle() {
+        return this._idle;
     }
     //---------------------
 
