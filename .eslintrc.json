@@ -36,16 +36,23 @@
         "functions": "ignore"
       }
     ],
-    "no-param-reassign": ["error", { "props": false }],
+    "no-param-reassign": ["error", {
+      "props": false
+    }],
     "global-require": "off",
     "object-shorthand": "off"
   },
-  "overrides": [
-    {
-      "files": ["*.test.js"],
-      "env": {
-        "jest": true
+  "overrides": [{
+    "files": ["*.test.js"],
+    "env": {
+      "jest": true
+    }
+  }],
+  "settings": {
+    "import/resolver": {
+      "webpack": {
+        "config": "config/webpack.common.js"
       }
     }
-  ]
+  }
 }
