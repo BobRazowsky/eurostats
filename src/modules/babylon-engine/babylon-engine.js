@@ -30,8 +30,6 @@ export default class BabylonEngine {
 
         this.mainLoop = self.app.modules.mainLoop;
 
-        this.initEngine();
-
         // creates basic camera and light if asked in config
         if (config.get("exampleCamera")) {
             this.initExampleCamera();
@@ -39,6 +37,8 @@ export default class BabylonEngine {
         if (config.get("exampleLight")) {
             this.initExampleLight();
         }
+
+        this.initEngine();
 
     }
 

@@ -1,14 +1,16 @@
 import self from "../index";
 
 /**
- * A generic 60 Hz loop.
- *
- * @class obsidian-core.lib.mainloop
- * @constructor
+ * A loop...
+ * Can be used to render 2d or 3d, or to do anything at a rather fixed time interval
+ * It's using RequestAnimationFrame, so to get a constant time interval,
+ * 60 must be a multiple of your desired fps
  */
-export default class MainLoop {
+class MainLoop {
 
     constructor() {
+        const config = MainLoop.FetchConfig();
+
         // Private parameters
         this._interval = 0;
         this._currentRequestId = null;
@@ -16,38 +18,61 @@ export default class MainLoop {
         this._lastLoopTime = this._lastLoopCorrectedTime;
 
         // Public parameters with getter-setters
-        this._activeFps = 60;
-        this._idleFps = 0;
+        this._activeFps = config.get("activeFps") || -1;
+        this._idleFps = config.get("idleFps") || 0;
         this._idle = false;
+        this._enabled = false;
 
         // Public parameters
+        /**
+         * Registered callbacks
+         * @type {Array}
+         */
         this.callbacks = [];
-        this.enabled = false;
-        this.idleTime = 10000; // time after app goes to idle in milliseconds, -1 is never
+
+        /**
+         * current fps
+         * @type {Number}
+         */
         this.fps = this.activeFps;
 
+        // Initialization
         this.initListeners();
         this.refreshIntervalValue();
+        if (config.get("debug")) {
+            this.initDebug();
+        }
         self.app.events.emit("initialize");
     }
 
     /**
-     * Refresh the wanted time _interval between callbacks
+     * Refresh the wanted time interval between callbacks
      */
     refreshIntervalValue() {
+        const epsilon = 0.01;
         if (this._idle) {
             if (this.idleFps > 0) {
-                this._interval = 1000 / this.idleFps;
+                this._interval = (1000 / this.idleFps) - epsilon;
+            } else if (this.idleFps === 0) {
+                if (this._currentRequestId) {
+                    window.cancelAnimationFrame(this._currentRequestId);
+                }
             } else {
                 this._interval = -1;
             }
+        } else if (this.activeFps > 0) {
+            this._interval = (1000 / this.activeFps) - epsilon;
+        } else if (this.activeFps === 0) {
+            if (this._currentRequestId) {
+                window.cancelAnimationFrame(this._currentRequestId);
+            }
         } else {
-            this._interval = 1000 / this.activeFps;
+            this._interval = -1;
         }
     }
 
     /**
-     * Window listener : lost of focus management
+     * Launch window listeners : lost of focus management
      */
     initListeners() {
         window.addEventListener("focus", () => {
@@ -62,14 +87,22 @@ export default class MainLoop {
         }, true);
     }
 
+    /**
+     * Add Debug callback to log loop info
+     * @return {[type]} [description]
+     */
+    initDebug() {
+        this.addCallback((loopInfo) => {
+            console.log("LoopInfos", JSON.stringify(loopInfo));
+        });
+    }
+
 
     /**
      * Start the loop.
-     *
-     * @method start
      */
     start() {
-        this.enabled = true;
+        this._enabled = true;
         if (this._currentRequestId) {
             window.cancelAnimationFrame(this._currentRequestId);
         }
@@ -79,11 +112,9 @@ export default class MainLoop {
 
     /**
      * Stop the loop.
-     *
-     * @method stop
      */
     stop() {
-        this.enabled = false;
+        this._enabled = false;
         if (this._currentRequestId) {
             window.cancelAnimationFrame(this._currentRequestId);
         }
@@ -92,8 +123,6 @@ export default class MainLoop {
 
     /**
      * Add a callback.
-     *
-     * @method addCallback
      * @param {Function} callback
      */
     addCallback(callback) {
@@ -102,8 +131,6 @@ export default class MainLoop {
 
     /**
      * Remove a callback.
-     *
-     * @method removeCallback
      * @param {Function} callback
      */
     removeCallback(callback) {
@@ -122,38 +149,58 @@ export default class MainLoop {
      * @param {Number} timestamp
      */
     _loop(now) {
-        if (this._interval < 0) {
-            return;
-        }
         // Request animation frame => _loop executed every screen refresh
         this._currentRequestId = requestAnimationFrame(t => this._loop(t));
 
-        // We execute the callbacks only if enough time has passed
-        const correctedTimeSinceLastCall = now - this._lastLoopCorrectedTime;
-        if (correctedTimeSinceLastCall > this._interval) {
-            // Get ready for next frame by setting lastTime=now, but...
-            // Also, adjust for interval not being multiple of 16.67
-            this._lastLoopCorrectedTime = now - (correctedTimeSinceLastCall % this._interval);
+        let loopInfo;
+        // actual time, for fps and deltaTime measurement
+        const timeSinceLastCall = now - this._lastLoopTime;
+        this.fps = 1000 / timeSinceLastCall;
+        this._lastLoopTime = now;
 
-            // actual time, for fps and deltaTime measurement
-            const timeSinceLastCall = now - this.lastLoopTime;
-            this.fps = 1000 / timeSinceLastCall;
-            this.lastLoopTime = now;
-
-            // loop events
-            self.app.events.emit("update", {
-                deltaTime: correctedTimeSinceLastCall,
+        // No limitation, the loop goes as fast as the screen refresh rate (if it can)
+        if (this._interval === -1) {
+            loopInfo = {
+                deltaTime: timeSinceLastCall,
                 fps: this.fps,
-                isIdle: this.isIdle,
-            });
+                idle: this.idle,
+            };
+            this._update(loopInfo);
+        } else {
+            // Fps throttling :
+            // We execute the callbacks only if enough time has passed
+            const correctedTimeSinceLastCall = now - this._lastLoopCorrectedTime;
+            if (correctedTimeSinceLastCall >= this._interval) {
+                // Get ready for next frame by setting lastTime=now, but...
+                // Also, adjust for interval not being multiple of 16.67
+                this._lastLoopCorrectedTime = now - (correctedTimeSinceLastCall % this._interval);
+                loopInfo = {
+                    deltaTime: correctedTimeSinceLastCall,
+                    fps: this.fps,
+                    idle: this.idle,
+                };
+            }
+            this._update(loopInfo);
+        }
+    }
 
-            // loop callbacks
-            for (let i = 0; i < this.callbacks.length; i++) {
-                try {
-                    this.callbacks[i](timeSinceLastCall, this.isIdle);
-                } catch (error) {
-                    throw Error(error);
-                }
+    /**
+     * Update function called in the loop :
+     * - call the callback functions
+     * - emit the update events
+     * @param  {Object} loopInfo loop informations transmitted to the callbacks and by the event
+     */
+    _update(loopInfo) {
+
+        // loop events
+        self.app.events.emit("update", loopInfo);
+
+        // loop callbacks
+        for (let i = 0; i < this.callbacks.length; i++) {
+            try {
+                this.callbacks[i](loopInfo);
+            } catch (error) {
+                throw Error(error);
             }
         }
     }
@@ -200,7 +247,19 @@ export default class MainLoop {
     get idle() {
         return this._idle;
     }
+
+    /**
+     * Is the loop running
+     * @return {Boolean}
+     */
+    get enabled() {
+        return this._enabled;
+    }
     //---------------------
 
+    static FetchConfig() {
+        return self.app.config;
+    }
 
 }
+export default MainLoop;
