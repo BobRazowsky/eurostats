@@ -1,13 +1,9 @@
 <template>
-
-    <div id = "menu">
-    </div>
-
-
+    <div id="menu-view"></div>
 </template>
 
 <style>
-    #menu{
+    #menu-view{
         float : left;
         width : 100px;
         height : 100%;

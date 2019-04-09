@@ -14,11 +14,13 @@ const app = obsidian("starter-app");
 app.use(Vuejs);
 app.use(MainLoop, {
     config: {
-        debug: true,
+        debug: false,
     },
 });
 app.use(BabylonEngine, {
-    canvasId: "main-canvas",
+    config: {
+        canvasId: "main-canvas",
+    },
 });
 app.use(Torus);
 

@@ -1,8 +1,7 @@
 <template>
 	<div id="app">
-        <menu></menu>
+        <main-menu></main-menu>
         <main-canvas></main-canvas>
-
     </div>
 </template>
 
@@ -11,7 +10,7 @@
 
 <script>
 import Vue from 'vue';
-import Menu from './menu.vue';
+import MainMenu from './main-menu.vue';
 import MainCanvas from './main-canvas.vue';
 
 //import Button from './components/Button'
@@ -19,10 +18,11 @@ import MainCanvas from './main-canvas.vue';
 export default {
     name: 'app',
     components: {
-        "menu":Menu, "main-canvas":MainCanvas
+        "main-menu": MainMenu,
+        "main-canvas": MainCanvas
     },
     created: function(){
-        console.log("COUCOU c'est moi l'app",this.meshManager);
+        console.log("COUCOU c'est moi l'app", this.meshManager);
     },
     methods: {
         onClick() {
