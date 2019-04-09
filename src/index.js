@@ -20,6 +20,7 @@ app.use(MainLoop, {
 app.use(BabylonEngine, {
     config: {
         canvasId: "main-canvas",
+        autostart: false,
     },
 });
 app.use(Torus);

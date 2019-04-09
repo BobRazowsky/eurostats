@@ -79,6 +79,7 @@ module.exports = {
     resolve: {
         alias: {
             vue: "vue/dist/vue.js",
+            src: path.resolve("src"),
         },
     },
 };

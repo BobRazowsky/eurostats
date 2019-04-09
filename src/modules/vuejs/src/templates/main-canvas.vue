@@ -4,9 +4,16 @@
     </div>
 </template>
 
+
 <script>
+import self from "../../index";
+
+
     export default {
         name: 'main-canvas',
+        mounted(){
+            self.app.modules.ObsidianBabylonEngine.start();
+        },
         data () {
             return {
             }

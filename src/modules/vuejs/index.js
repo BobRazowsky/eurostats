@@ -1,6 +1,6 @@
 export default {
     name: "vuejs",
-    requires: [],
+    requires: ["torus"],
     load() {
         const VuejsController = require("./src/vuejs-controller").default;
         return new VuejsController();
