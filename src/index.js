@@ -18,7 +18,9 @@ app.use(MainLoop, {
     },
 });
 app.use(BabylonEngine, {
-    canvasId: "main-canvas",
+    config: {
+        canvasId: "main-canvas",
+    },
 });
 app.use(Torus);
 

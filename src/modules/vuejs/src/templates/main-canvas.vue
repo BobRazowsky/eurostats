@@ -4,7 +4,7 @@
 
 <script>
     export default {
-        name: 'canvas',
+        name: 'main-canvas',
         data () {
             return {
             }
