@@ -54,6 +54,8 @@ const Torus = {
         });
 
         Torus.mesh = torus;
+        torus.rotationQuaternion = BABYLON.Quaternion.Identity();
+        self.app.events.emit("ready");
     },
 
 

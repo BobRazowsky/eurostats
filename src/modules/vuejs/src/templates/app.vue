@@ -22,13 +22,8 @@ export default {
         "main-canvas": MainCanvas
     },
     created: function(){
-        console.log("COUCOU c'est moi l'app", this.meshManager);
+        console.log("Hey, it's me, the main vue for your Obsidian app", this.meshManager);
     },
-    methods: {
-        onClick() {
-
-        }
-    }
   }
 </script>
 
