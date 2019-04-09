@@ -1,9 +1,12 @@
 <template>
-<div id="menu-view"></div>
+    <div id="menu-view">
+        <torus-menu></torus-menu>
+    </div>
 </template>
 
 <script>
 import self from "../../index";
+
 
 export default {
     name: 'main-menu',

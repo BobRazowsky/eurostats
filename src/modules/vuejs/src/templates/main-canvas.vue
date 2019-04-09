@@ -12,7 +12,7 @@ import self from "../../index";
     export default {
         name: 'main-canvas',
         mounted(){
-            self.app.modules.ObsidianBabylonEngine.start();
+            self.app.modules.obsidianBabylonEngine.start();
         },
         data () {
             return {

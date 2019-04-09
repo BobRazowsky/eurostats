@@ -10,17 +10,24 @@ const Torus = {
     /**
      * @type BABYLON.Scene
      */
-    scene: self.app.modules.babylonEngine.scene,
+    scene: null,
 
     mesh: null,
 
-    init() {
-        if (self.app.modules.babylonEngine.isReady) {
-            this.createTorus();
+    test: "test",
+
+    Init() {
+        if (self.app.modules.obsidianBabylonEngine.isReady) {
+            Torus.CreateTorus();
+        } else {
+            self.app.events.on("@obsidian-babylon-engine.ready", () => {
+                Torus.CreateTorus();
+            });
         }
     },
 
-    createTorus() {
+    CreateTorus() {
+        Torus.scene = self.app.modules.obsidianBabylonEngine.scene;
         // The torus and its material
         const torus = BABYLON.MeshBuilder.CreateTorus(
             "torus", {

@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 8080;
 
 module.exports = merge(common, {
     mode: "development",
-    devtool: "cheap-eval-source-map",
+    devtool: "eval-source-map",
     output: {
         path: DIST_DIR,
         filename: "bundle.js",

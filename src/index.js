@@ -2,7 +2,7 @@ import "@babel/polyfill";
 import obsidian from "@obsidianjs/obsidian";
 
 
-import BabylonEngine from "obsidian-babylon-engine";
+import ObsidianBabylonEngine from "obsidian-babylon-engine";
 import Vuejs from "./modules/vuejs";
 import Torus from "./modules/torus";
 import MainLoop from "./modules/main-loop";
@@ -17,7 +17,7 @@ app.use(MainLoop, {
         debug: false,
     },
 });
-app.use(BabylonEngine, {
+app.use(ObsidianBabylonEngine, {
     config: {
         canvasId: "main-canvas",
         autostart: false,
