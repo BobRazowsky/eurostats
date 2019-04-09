@@ -1,5 +1,5 @@
 <template>
-<div>Rouge : {{color.r}}</div>
+<div v-if="color">Rouge : {{color.r}}</div>
 </template>
 
 <script>
@@ -10,18 +10,18 @@ export default {
     name: 'torus-infos',
     watch: {
         material(val) {
-            this.color = val.material.diffuseColor;
+            this.color = val.diffuseColor;
         }
     },
     data(){
         return {
             torus: Torus,
-            color : {r :0}
+            color : null
         }
     },
     computed:{
         material(){
-            return Torus.mesh? Torus.mesh.material: {diffuseColor : {r :0}};
+            return Torus.mesh? Torus.mesh.material: null;
         }
     },
     components: {},
