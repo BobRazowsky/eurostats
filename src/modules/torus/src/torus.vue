@@ -1,3 +1,6 @@
+<!-- Torus Vue -->
+<!-- Display the red ratio of the torus material -->
+<!-- And its rotation parameters -->
 <template>
     <div id="torus">
         <div v-if="color">Rouge : {{color.r}}</div>
@@ -19,6 +22,7 @@ import self from "../index";
 export default {
     name: 'torus-infos',
     mounted(){
+        // We bind the torus data once it's ready
         self.app.events.on("ready",()=>{
             this.color = Torus.mesh.material.diffuseColor;
             this.rotation = Torus.mesh.rotationQuaternion;

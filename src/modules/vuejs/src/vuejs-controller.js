@@ -1,14 +1,13 @@
 import Vue from "vue";
 import App from "./templates/app.vue";
 
+/**
+ * Instanciate the main Vue, on the app element
+ * @type {Boolean}
+ */
 export default class VuejsController {
 
     constructor() {
-
-        // Regroup data of different modules
-        this.data = {
-
-        };
 
         Vue.config.productionTip = false;
 
@@ -18,8 +17,6 @@ export default class VuejsController {
             el: "#app",
             render: h => h(App),
         });
-
-
     }
 
 }

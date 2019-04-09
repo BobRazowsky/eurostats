@@ -12,11 +12,13 @@ const Torus = {
      */
     scene: null,
 
+    /**
+     * @type BABYLON.Mesh
+     */
     mesh: null,
 
-    test: "test",
-
     Init() {
+        // We must create the torus once the babylonjs engine is ready
         if (self.app.modules.obsidianBabylonEngine.isReady) {
             Torus.CreateTorus();
         } else {
@@ -55,6 +57,8 @@ const Torus = {
 
         Torus.mesh = torus;
         torus.rotationQuaternion = BABYLON.Quaternion.Identity();
+
+        // Ready events, listened by the view
         self.app.events.emit("ready");
     },
 
