@@ -66,6 +66,7 @@
     "vue-template-compiler": "^2.6.7"
   },
   "dependencies": {
+    "@obsidianjs/http-request": "^0.1.4",
     "express": "^4.16.3",
     "obsidian-babylon-engine": "git+ssh://git@git.wanadev.org:obsidian/obsidian-engine-babylonjs.git"
   }

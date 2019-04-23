@@ -1,34 +1,70 @@
-import * as BABYLON from "babylonjs";
-import self from ".";
+import * as BABYLON from "@babylonjs/core/Legacy/legacy";
+import self from "../index";
+
+// const materials = require("./materials.json");
 
 
-export default class MaterialManager {
+/**
+ * Material Manager allows you to load and reuse material you use in your scene
+ */
+class MaterialManager {
 
     /**
      * @class bematrix.MaterialManager
      * */
     constructor() {
+        // default texturePath, will be added as prefix to texture url
+        this.texturePath = self.app.config.get("texturePath") || "./";
 
-        this.path = "/assets/textures/";
+        this.loadedMaterials = {};
+        this.loadedTextures = {};
 
-        this.loadedMaterials = [];
+        if (self.app.modules.obsidianBabylonEngine.isReady) {
+            this.scene = self.app.modules.obsidianBabylonEngine.scene;
+            this.init();
+        } else {
+            self.app.events.on("@obsidian-babylon-engine.ready", (engine) => {
+                /** @type BABYLON.Scene  */
+                this.scene = engine.scene;
+                this.init();
+            });
+        }
+    }
 
-        this.loadedTextures = [];
-        self.app.events.on("@obsidian-engine.engine-ready", (scene) => {
-            /** @type BABYLON.Scene  */
-            this.scene = scene;
+    init() {
+        this.loadMaterialsFromJSON("assets/materials/materials.json");
+        // this.loadMaterial("inox", materials.inox);
+        self.app.events.emit("ready");
+    }
+
+    loadMaterialsFromJSON(jsonURL) {
+        self.app.modules.httpRequest.getJson(jsonURL)
+            .then((materialObjects) => {
+                // TODO double url resolve
+                // https://nodejs.org/api/url.html#url_url_resolve_from_to
+                this.loadMaterials(materialObjects);
+            })
+            .catch((error) => {
+                self.app.log.error(error);
+            });
+    }
+
+    loadMaterials(materialObjects) {
+        Object.keys(materialObjects).forEach((name) => {
+            this.loadMaterial(name, materialObjects[name]);
         });
     }
 
-    loadMaterials(materialsParams) {
-        Object.keys(materialsParams).forEach((name) => {
-            this.loadMaterial(name, materialsParams[name]);
+    disposeMaterials(materialsNames) {
+        Object.keys(materialsNames).forEach((materialsName) => {
+            this.disposeMaterial(materialsName);
         });
     }
 
     /**
      * Creates a material named after the name parameter
      * Parameters in the param Object will be assigned to the material :
+     * - type : type of material, e.g. StandardMaterial, PBRMaterial, PBRMetallicRoughnessMaterial
      * - Primitives (string, number, boolean) will be applied directly
      * - Textures must be objects, with an url parameter and classic Babylon Texture parameters
      *   example : { url : "leather.jpg", uScale : 3, vSCale :3 }
@@ -40,25 +76,22 @@ export default class MaterialManager {
      *   @returns {BABYLON.StandardMaterial}
      */
     loadMaterial(name, params = {}) {
-        // TODO remplacer cette fonction par un loadmaterialJson et utiliser le loadMaterial de aymeric (voir en bas)
-        // Le but étant de garder le système de librairie de matériaux et de pouvoir retaper dedans si il a déjà été loadé
         if (!this.loadedMaterials[name]) {
-            // Only standard material for performance issues
-            const mat = new BABYLON.StandardMaterial(name, this.scene);
+            // type represent material type,
+            // it can be PBRMaterial, StandardMaterial, PBRMetallicRoughnessMaterial etc.
+            // by default it's StandardMaterial
+            let type = params.type || "StandardMaterial";
+            if (typeof BABYLON[type] !== "function") {
+                type = "StandardMaterial";
+            }
+            const mat = new BABYLON[type](name, this.scene);
             Object.keys(params).forEach((pK) => {
                 if (pK.includes("Texture")) {
                     const texParams = params[pK];
                     if (!texParams.url) {
-                        /* console.error(
-                            "No url specified for ",
-                            pK,
-                            " of material ",
-                            name
-                        ); */
+                        self.app.log.error("No url specified for ", pK, " of material ", name);
                     }
-                    const url = texParams.url;
-                    delete texParams.url;
-                    mat[pK] = this.loadTexture(url, texParams);
+                    mat[pK] = this.loadTexture(texParams.url, texParams);
                 } else if (pK.includes("Color")) {
                     const colorParams = params[pK];
                     let color;
@@ -81,6 +114,13 @@ export default class MaterialManager {
         return this.loadedMaterials[name];
     }
 
+    disposeMaterial(materialName) {
+        if (this.loadedMaterials[materialName]) {
+            this.loadedMaterials[materialName].dispose();
+            delete this.loadedMaterials[materialName];
+        }
+    }
+
     /**
      * Loads a texture from a file located at the url parameter
      * Assign the parameters of the param object to it
@@ -95,21 +135,19 @@ export default class MaterialManager {
             const extension = urlSplit[urlSplit.length - 1].toLowerCase();
             if (extension === "hdr") {
                 this.loadedTextures[url] = new BABYLON.HDRCubeTexture(
-                    this.path + url,
+                    this.texturePath + url,
                     this.scene,
                     params.size ? params.size : 256
                 );
             } else if (extension === "dds") {
-                this.loadedTextures[
-                    url
-                ] = BABYLON.CubeTexture.CreateFromPrefilteredData(
-                    this.path + url,
+                this.loadedTextures[url] = BABYLON.CubeTexture.CreateFromPrefilteredData(
+                    this.texturePath + url,
                     this.scene
                 );
             } else {
                 // Other textures type
                 this.loadedTextures[url] = new BABYLON.Texture(
-                    this.path + url,
+                    this.texturePath + url,
                     this.scene
                 );
             }
@@ -121,97 +159,13 @@ export default class MaterialManager {
         return tex;
     }
 
-    createHoleMaterial(mat) {
-        if (!this.loadedMaterials[`${mat.name}-hole`]) {
-            const texMaterial = this.loadTexture("holes.png", {
-                uScale: 1,
-                vScale: 1,
-                uOffset: 0
-            });
-            /**
-             * @type BABYLON.StandardMaterial
-             */
-            const holeMaterial = mat.clone();
-            holeMaterial.ambientTexture = texMaterial;
-            this.loadedMaterials[`${mat.name}-hole`] = holeMaterial;
+    disposeTexture(url) {
+        if (this.loadedTextures[url]) {
+            this.loadedTextures[url].dispose();
+            delete this.loadedTextures[url];
         }
-        return this.loadedMaterials[`${mat.name}-hole`];
-    }
-
-    /**
-     * Create and return the ledskin material
-     */
-    getLedskinMaterial() {
-        if (!this.ledskinMaterial) {
-            const texMaterial = this.loadTexture("carbon.png", {
-                uScale: 5,
-                vScale: 5,
-                uOffset: 0
-            });
-            this.ledskinMaterial = new BABYLON.StandardMaterial("ledskin-mat", this.scene);
-            this.ledskinMaterial.ambientTexture = texMaterial;
-        }
-        return this.ledskinMaterial;
-    }
-
-
-    getMaterial(materialName) {
-        let hdrTexture = BABYLON.CubeTexture.CreateFromPrefilteredData("assets/textures/environment.dds", obsidian.engine3d.scene);
-
-        let mat = null;
-        switch (materialName) {
-            case 'inox':
-                mat = new BABYLON.PBRMaterial("inox", obsidian.engine3d.scene);
-                mat.reflectivityColor = new BABYLON.Color3(0.85, 0.85, 0.85);
-                mat.reflectionTexture = hdrTexture;
-                mat.albedoColor = new BABYLON.Color3(0.01, 0.01, 0.01);
-                mat.microSurface = 0.85;
-                break;
-            case 'tolle_gris':
-                mat = new BABYLON.PBRMaterial("tolle_gris", obsidian.engine3d.scene);
-                mat.albedoColor = new BABYLON.Color3.FromHexString("#bdbcb8");
-                mat.reflectivityColor = new BABYLON.Color3.FromHexString("#bdbcb8");
-                mat.reflectionTexture = hdrTexture;
-                mat.microSurface = 0.7;
-                break;
-            case 'tolle_bleu':
-                mat = new BABYLON.PBRMaterial("tolle_bleue", obsidian.engine3d.scene);
-                mat.albedoColor = new BABYLON.Color3.FromHexString("#163257");
-                mat.reflectivityColor = new BABYLON.Color3.FromHexString("#163257");
-                mat.reflectionTexture = hdrTexture;
-                mat.microSurface = 0.7;
-                mat.environmentIntensity = 0.1;
-                mat.usePhysicalLightFalloff = false;
-                break;
-            case 'melamine_gris':
-                mat = new BABYLON.PBRMaterial("melamine", obsidian.engine3d.scene);
-                mat.albedoColor = new BABYLON.Color3.FromHexString("#bdbcb8");
-                //mat.albedoTexture = new BABYLON.Texture("assets/images/normal.jpg", obsidian.engine3d.scene);
-                mat.ambientColor = new BABYLON.Color3.FromHexString("#bdbcb8");
-                mat.reflectivityColor = new BABYLON.Color3.FromHexString("#bdbcb8");
-                mat.microSurface = 0.5;
-                mat.usePhysicalLightFalloff = false;
-                // TODO utiliser le load texture
-                mat.bumpTexture = new BABYLON.Texture("assets/textures/wallNormal.jpg", obsidian.engine3d.scene);
-                mat.bumpTexture.uScale = 40;
-                mat.bumpTexture.vScale = 40;
-                mat.bumpTexture.level = 1;
-                break;
-            case 'material':
-                mat = new BABYLON.StandardMaterial("error", obsidian.engine3d.scene);
-                mat.diffuseColor = new BABYLON.Color3(0, 1, 0);
-                break;
-            case 'plastic':
-                mat = new BABYLON.PBRMaterial("plastic", obsidian.engine3d.scene);
-                mat.albedoColor = new BABYLON.Color3.FromHexString("#555555");
-                mat.reflectivityColor = new BABYLON.Color3.FromHexString("#555555");
-                mat.microSurface = 0.5;
-                break;
-            default:
-                break;
-        }
-
-        return mat;
     }
 
 }
+
+export default MaterialManager;

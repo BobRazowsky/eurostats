@@ -1,0 +1,72 @@
+{
+  "material_debug": {
+    "diffuseColor": {
+      "r": 1,
+      "g": 0,
+      "b": 0
+    }
+  },
+
+  "inox": {
+    "type": "PBRMaterial",
+    "reflectivityColor": {
+      "r": 0.85,
+      "g": 0.85,
+      "b": 0.85
+    },
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "albedoColor": {
+      "r": 0.01,
+      "g": 0.01,
+      "b": 0.01
+    },
+    "microSurface": 0.85
+  },
+
+  "tolle_gris": {
+    "type": "PBRMaterial",
+    "reflectivityColor": "#bdbcb8",
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "albedoColor": "#bdbcb8",
+    "microSurface": 0.7
+  },
+
+  "tolle_bleue": {
+    "type": "PBRMaterial",
+    "reflectivityColor": "#163257",
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "albedoColor": "#163257",
+    "microSurface": 0.7,
+    "environmentIntensity": 0.1,
+    "usePhysicalLightFalloff": false
+  },
+
+  "melamine_gris": {
+    "type": "PBRMaterial",
+    "albedoColor": "#bdbcb8",
+    "ambientColor": "#bdbcb8",
+    "reflectivityColor": "#bdbcb8",
+    "microSurface": 0.5,
+    "usePhysicalLightFalloff": false,
+    "bumpTexture": {
+      "url": "wallNormal.jpg",
+      "uScale": 40,
+      "vScale": 40,
+      "level": 1
+    }
+  },
+
+  "plastic": {
+    "type": "PBRMaterial",
+    "albedoColor": "#555555",
+    "reflectivityColor": "#555555",
+    "microSurface": 0.5
+  }
+
+}

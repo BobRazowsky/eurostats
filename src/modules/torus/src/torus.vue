@@ -10,7 +10,7 @@ export default {
     name: 'torus-infos',
     watch: {
         material(val) {
-            this.color = val.diffuseColor;
+            // this.color = val.diffuseColor;
         }
     },
     data(){
