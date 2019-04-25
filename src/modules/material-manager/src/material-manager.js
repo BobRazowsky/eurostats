@@ -1,6 +1,7 @@
 import * as BABYLON from "@babylonjs/core/Legacy/legacy";
+import * as URL from "url";
+import * as uuidv3 from "uuid/v3";
 import self from "../index";
-
 // const materials = require("./materials.json");
 
 
@@ -14,10 +15,10 @@ class MaterialManager {
      * */
     constructor() {
         // default texturePath, will be added as prefix to texture url
-        this.texturePath = self.app.config.get("texturePath") || "./";
-
+        this.texturePath = self.app.config.get("texturePath") || "./texturePath";
         this.loadedMaterials = {};
         this.loadedTextures = {};
+        this.uuidNamespace = "d362939c-3648-4d31-8f2d-977a6abca424";
 
         if (self.app.modules.obsidianBabylonEngine.isReady) {
             this.scene = self.app.modules.obsidianBabylonEngine.scene;
@@ -32,29 +33,46 @@ class MaterialManager {
     }
 
     init() {
-        this.loadMaterialsFromJSON("assets/materials/materials.json");
+        this.loadMaterialsFromJSON("assets/modules/material-manager/materials.json").then(() => {
+            self.app.events.emit("ready");
+        });
         // this.loadMaterial("inox", materials.inox);
-        self.app.events.emit("ready");
     }
 
+    /**
+     * loadMaterialsFromJSON
+     *
+     * @param jsonURL
+     */
     loadMaterialsFromJSON(jsonURL) {
-        self.app.modules.httpRequest.getJson(jsonURL)
+        return self.app.modules.httpRequest.getJson(jsonURL)
             .then((materialObjects) => {
                 // TODO double url resolve
                 // https://nodejs.org/api/url.html#url_url_resolve_from_to
                 this.loadMaterials(materialObjects);
+                return true;
             })
             .catch((error) => {
                 self.app.log.error(error);
             });
     }
 
+    /**
+     * loadMaterials
+     *
+     * @param materialObjects
+     */
     loadMaterials(materialObjects) {
         Object.keys(materialObjects).forEach((name) => {
             this.loadMaterial(name, materialObjects[name]);
         });
     }
 
+    /**
+     * disposeMaterials
+     *
+     * @param materialsNames
+     */
     disposeMaterials(materialsNames) {
         Object.keys(materialsNames).forEach((materialsName) => {
             this.disposeMaterial(materialsName);
@@ -80,10 +98,16 @@ class MaterialManager {
             // type represent material type,
             // it can be PBRMaterial, StandardMaterial, PBRMetallicRoughnessMaterial etc.
             // by default it's StandardMaterial
-            let type = params.type || "StandardMaterial";
-            if (typeof BABYLON[type] !== "function") {
-                type = "StandardMaterial";
+
+            let type = "StandardMaterial";
+            if (params.type) {
+                if (typeof BABYLON[params.type] === "function") {
+                    ({ type } = params);// go to hell eslint
+                }
+                delete params.type;
             }
+
+
             const mat = new BABYLON[type](name, this.scene);
             Object.keys(params).forEach((pK) => {
                 if (pK.includes("Texture")) {
@@ -91,7 +115,9 @@ class MaterialManager {
                     if (!texParams.url) {
                         self.app.log.error("No url specified for ", pK, " of material ", name);
                     }
-                    mat[pK] = this.loadTexture(texParams.url, texParams);
+                    const texUrl = texParams.url;
+                    delete texParams.url;
+                    mat[pK] = this.loadTexture(texUrl, texParams);
                 } else if (pK.includes("Color")) {
                     const colorParams = params[pK];
                     let color;
@@ -114,6 +140,7 @@ class MaterialManager {
         return this.loadedMaterials[name];
     }
 
+
     disposeMaterial(materialName) {
         if (this.loadedMaterials[materialName]) {
             this.loadedMaterials[materialName].dispose();
@@ -129,40 +156,56 @@ class MaterialManager {
      * @param {Object} params
      * */
     loadTexture(url, params = {}) {
-        if (!this.loadedTextures[url]) {
+        const id = this.generateTextureId(url, params);
+        if (!this.loadedTextures[id]) {
             // dds & hdr handling for env map
             const urlSplit = url.split(".");
             const extension = urlSplit[urlSplit.length - 1].toLowerCase();
+            const completeUrl = URL.resolve(this.texturePath, url);
             if (extension === "hdr") {
-                this.loadedTextures[url] = new BABYLON.HDRCubeTexture(
-                    this.texturePath + url,
+                this.loadedTextures[id] = new BABYLON.HDRCubeTexture(
+                    completeUrl,
                     this.scene,
                     params.size ? params.size : 256
                 );
             } else if (extension === "dds") {
-                this.loadedTextures[url] = BABYLON.CubeTexture.CreateFromPrefilteredData(
-                    this.texturePath + url,
+                this.loadedTextures[id] = BABYLON.CubeTexture.CreateFromPrefilteredData(
+                    completeUrl,
                     this.scene
                 );
             } else {
                 // Other textures type
-                this.loadedTextures[url] = new BABYLON.Texture(
-                    this.texturePath + url,
+                this.loadedTextures[id] = new BABYLON.Texture(
+                    completeUrl,
                     this.scene
                 );
             }
         }
-        const tex = this.loadedTextures[url].clone();
+        const tex = this.loadedTextures[id].clone();
         Object.keys(params).forEach((param) => {
             tex[param] = params[param];
         });
         return tex;
     }
 
-    disposeTexture(url) {
-        if (this.loadedTextures[url]) {
-            this.loadedTextures[url].dispose();
-            delete this.loadedTextures[url];
+    /**
+     * Generate an unique id for this texture url with those parameters
+     * @param url
+     * @param params
+     * @returns {String}
+     */
+    generateTextureId(url, params) {
+        const sortedParams = {};
+        Object.keys(params).sort().forEach((k) => {
+            sortedParams[k] = params[k];
+        });
+        return uuidv3(url + JSON.stringify(params), this.uuidNamespace);
+    }
+
+    disposeTexture(id) {
+        if (this.loadedTextures[id]) {
+            this.loadedTextures[id].dispose();
+            delete this.loadedTextures[id];
         }
     }
 

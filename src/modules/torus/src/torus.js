@@ -20,7 +20,7 @@ const Torus = {
         if (self.app.modules.obsidianBabylonEngine.isReady) {
             Torus.CreateTorus();
         } else {
-            self.app.events.on("@obsidian-babylon-engine.ready", () => {
+            self.app.events.on("@material-manager.ready", () => {
                 Torus.CreateTorus();
             });
         }
@@ -28,6 +28,7 @@ const Torus = {
 
     CreateTorus() {
         Torus.scene = self.app.modules.obsidianBabylonEngine.scene;
+
         // The torus and its material
         const torus = BABYLON.MeshBuilder.CreateTorus(
             "torus", {
