@@ -16,6 +16,8 @@ const Torus = {
 
     test: "test",
 
+    materialManager: self.app.modules.materialManager,
+
     Init() {
         if (self.app.modules.obsidianBabylonEngine.isReady) {
             Torus.CreateTorus();
@@ -55,9 +57,13 @@ const Torus = {
         // });
 
         Torus.mesh = torus;
-        // self.app.events.on("@material-manager.ready", () => {
         /** @type BABYLON.Scene  */
-        torus.material = self.app.modules.materialManager.loadedMaterials.inox;
+
+
+        self.app.modules.materialManager.loadMaterialsFromJSON("assets/modules/material-library/materials.json").then(() => {
+            torus.material = Torus.materialManager.getMaterials().metal_plate;
+        });
+
         // });
     },
 

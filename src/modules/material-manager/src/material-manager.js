@@ -4,7 +4,6 @@ import * as uuidv3 from "uuid/v3";
 import self from "../index";
 // const materials = require("./materials.json");
 
-
 /**
  * Material Manager allows you to load and reuse material you use in your scene
  */
@@ -22,21 +21,38 @@ class MaterialManager {
 
         if (self.app.modules.obsidianBabylonEngine.isReady) {
             this.scene = self.app.modules.obsidianBabylonEngine.scene;
-            this.init();
+            MaterialManager.init();
         } else {
             self.app.events.on("@obsidian-babylon-engine.ready", (engine) => {
                 /** @type BABYLON.Scene  */
                 this.scene = engine.scene;
-                this.init();
+                MaterialManager.init();
             });
         }
     }
 
-    init() {
-        this.loadMaterialsFromJSON("assets/modules/material-manager/materials.json").then(() => {
-            self.app.events.emit("ready");
-        });
+    static init() {
+        self.app.events.emit("ready");
+
+        // this.loadMaterialsFromJSON("assets/modules/material-manager/materials.json").then(() => {
+        // });
         // this.loadMaterial("inox", materials.inox);
+    }
+
+    /**
+     * Return list of loaded materials, alias of this.loadedMaterials
+     * @return {Object} listMaterials
+     */
+    getMaterials() {
+        return this.loadedMaterials;
+    }
+
+    /**
+     * Return list of loaded textures, alias of this.loadedTextures
+     * @return {Object} listTextures
+     */
+    getTextures() {
+        return this.loadedTextures;
     }
 
     /**
@@ -47,8 +63,6 @@ class MaterialManager {
     loadMaterialsFromJSON(jsonURL) {
         return self.app.modules.httpRequest.getJson(jsonURL)
             .then((materialObjects) => {
-                // TODO double url resolve
-                // https://nodejs.org/api/url.html#url_url_resolve_from_to
                 this.loadMaterials(materialObjects);
                 return true;
             })
@@ -66,6 +80,10 @@ class MaterialManager {
         Object.keys(materialObjects).forEach((name) => {
             this.loadMaterial(name, materialObjects[name]);
         });
+    }
+
+    loadMaterialsSample() {
+        this.loadMaterials(require("./materials-sample"));
     }
 
     /**
@@ -102,7 +120,9 @@ class MaterialManager {
             let type = "StandardMaterial";
             if (params.type) {
                 if (typeof BABYLON[params.type] === "function") {
-                    ({ type } = params);// go to hell eslint
+                    ({
+                        type,
+                    } = params); // go to hell eslint
                 }
                 delete params.type;
             }
