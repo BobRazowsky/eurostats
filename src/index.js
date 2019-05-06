@@ -27,6 +27,7 @@ app.use(ObsidianBabylonEngine, {
 app.use(MaterialManager, {
     config: {
         texturePath: "/assets/modules/material-library/",
+        debug: true,
     },
 });
 app.use(Torus);

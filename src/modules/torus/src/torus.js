@@ -61,7 +61,7 @@ const Torus = {
 
 
         self.app.modules.materialManager.loadMaterialsFromJSON("assets/modules/material-library/materials.json").then(() => {
-            torus.material = Torus.materialManager.getMaterials().metal_plate;
+            torus.material = Torus.materialManager.getMaterials().inox;
         });
 
         // });

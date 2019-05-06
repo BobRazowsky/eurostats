@@ -29,6 +29,10 @@ class MaterialManager {
                 MaterialManager.init();
             });
         }
+
+        if (self.app.config.get("debug") === true) {
+            this.initDebug();
+        }
     }
 
     static init() {
@@ -37,6 +41,10 @@ class MaterialManager {
         // this.loadMaterialsFromJSON("assets/modules/material-manager/materials.json").then(() => {
         // });
         // this.loadMaterial("inox", materials.inox);
+    }
+
+    initDebug() {
+        window.materialManager = this;
     }
 
     /**

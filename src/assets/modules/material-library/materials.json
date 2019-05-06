@@ -8,6 +8,10 @@
   },
 
   "inox": {
+    "metadata": {
+      "tags": ["metal", "unpolish", "unshiny"],
+      "comments": ["You can adjust microsurface to get adjust shininess"]
+    },
     "type": "PBRMaterial",
     "reflectivityColor": {
       "r": 0.85,
@@ -23,6 +27,24 @@
       "b": 0.01
     },
     "microSurface": 0.85
+  },
+
+  "fakeMirror": {
+    "type": "PBRMaterial",
+    "reflectivityColor": {
+      "r": 0.85,
+      "g": 0.85,
+      "b": 0.85
+    },
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "albedoColor": {
+      "r": 0.01,
+      "g": 0.01,
+      "b": 0.01
+    },
+    "microSurface": 0.95
   },
 
   "tolle_gris": {
@@ -55,7 +77,7 @@
     "microSurface": 0.5,
     "usePhysicalLightFalloff": false,
     "bumpTexture": {
-      "url": "wallNormal.jpg",
+      "url": "melamine/melamine_normal.jpg",
       "uScale": 40,
       "vScale": 40,
       "level": 1
@@ -63,33 +85,37 @@
   },
 
   "brick": {
-    "type": "PBRSpecularGlossinessMaterial",
-    "glossiness": 0.4,
+    "type": "PBRMaterial",
     "lightmapTexture": {
       "url": "yellow_bricks_1k_jpg/yellow_bricks_AO_1k.jpg",
       "uScale": 5,
       "vScale": 2,
       "level": 0.06
     },
-    "environmentTexture": {
+    "microSurface": 0.69,
+    "reflectivityColor": "#ccc",
+    "reflectionTexture": {
       "url": "environment.dds"
     },
-    "specularGlossinessTexture": {
+    "microSurfaceTexture": {
       "url": "yellow_bricks_1k_jpg/yellow_bricks_spec_1k.jpg",
       "uScale": 5,
       "vScale": 2
     },
-    "diffuseTexture": {
+    "albedoTexture": {
       "url": "yellow_bricks_1k_jpg/yellow_bricks_diff_1k.jpg",
       "uScale": 5,
       "vScale": 2
     },
-    "normalTexture": {
+    "bumpTexture": {
       "url": "yellow_bricks_1k_jpg/yellow_bricks_nor_1k.jpg",
       "uScale": 5,
       "vScale": 2,
-      "level": 1.6
-    }
+      "level": -10
+    },
+    "useParallax": true,
+    "useParallaxOcclusion": true,
+    "parallaxScaleBias": 0.2
   },
 
   "metal_plate": {
@@ -120,7 +146,7 @@
       "url": "metal_plate_1k_jpg/metal_plate_nor_1k.jpg",
       "uScale": 5,
       "vScale": 2,
-      "level": 1.6
+      "level": -1.6
     }
   },
 
@@ -165,7 +191,6 @@
     "cameraExposure": 0.5,
     "cameraContrast": 1.7,
     "microSurface": 1,
-
     "reflectivityColor": {
       "r": 0.1,
       "g": 0.1,
@@ -176,8 +201,96 @@
       "g": 0.3,
       "b": 0.3
     }
+  },
+
+  "gold": {
+    "type": "PBRMaterial",
+    "albedoColor": "#ffcc4c",
+    "reflectivityColor": "#ffcc4c",
+    "microSurface": 0.89,
+    "usePhysicalLightFalloff": false,
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "bumpTexture": {
+      "url": "metal_plate/metal_bump.jpg",
+      "uScale": 100,
+      "vScale": 40,
+      "level": 1
+    }
+  },
+
+  "silver": {
+    "type": "PBRMaterial",
+    "albedoColor": "#ffffff",
+    "reflectivityColor": "#ffffff",
+    "microSurface": 0.89,
+    "usePhysicalLightFalloff": false,
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "bumpTexture": {
+      "url": "metal_plate/metal_bump.jpg",
+      "uScale": 50,
+      "vScale": 40,
+      "level": 1
+    }
+  },
+
+  "copper": {
+    "type": "PBRMaterial",
+    "albedoColor": {
+      "r": 0.898,
+      "g": 0.129,
+      "b": 0.192
+    },
+    "reflectivityColor": {
+      "r": 0.929,
+      "g": 0.443,
+      "b": 0.188
+    },
+    "microSurface": 0.89,
+    "usePhysicalLightFalloff": false,
+    "reflectionTexture": {
+      "url": "environment.dds"
+    },
+    "bumpTexture": {
+      "url": "metal_plate/metal_bump.jpg",
+      "uScale": 50,
+      "vScale": 40,
+      "level": 1
+    }
+  },
+
+  "wood": {
+    "type": "PBRSpecularGlossinessMaterial",
+    "glossiness": 0.7,
+    "specularColor": {
+      "r": 0.41,
+      "g": 0.41,
+      "b": 0.32
+    },
+    "environmentTexture": {
+      "url": "environment.dds"
+    },
+    "diffuseTexture": {
+      "url": "wood_seamless/wood_seamless.jpg",
+      "uScale": 5,
+      "vScale": 2,
+      "level": 0.8
+    },
+    "normalTexture": {
+      "url": "wood_seamless/wood_seamless_normal.png",
+      "uScale": 5,
+      "vScale": 2,
+      "level": 1
+    },
+    "specularGlossinessTexture": {
+      "url": "wood_seamless/wood_seamless_specular.png",
+      "uScale": 5,
+      "vScale": 2,
+      "level": 1
+    }
   }
-
-
 
 }
