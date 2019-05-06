@@ -17,7 +17,17 @@ class MaterialManager {
         this.texturePath = self.app.config.get("texturePath") || "./texturePath";
         this.loadedMaterials = {};
         this.loadedTextures = {};
+
+        /**
+         * used to generate texture ids from their url and parameters
+        */
         this.uuidNamespace = "d362939c-3648-4d31-8f2d-977a6abca424";
+
+        /**
+         * Dom element for the material switcher
+         * (disabled by default )
+         */
+        this.switcherDomElement = null;
 
         if (self.app.modules.obsidianBabylonEngine.isReady) {
             this.scene = self.app.modules.obsidianBabylonEngine.scene;
@@ -37,10 +47,6 @@ class MaterialManager {
 
     static init() {
         self.app.events.emit("ready");
-
-        // this.loadMaterialsFromJSON("assets/modules/material-manager/materials.json").then(() => {
-        // });
-        // this.loadMaterial("inox", materials.inox);
     }
 
     initDebug() {
@@ -109,7 +115,7 @@ class MaterialManager {
      * Creates a material named after the name parameter
      * Parameters in the param Object will be assigned to the material :
      * - type : type of material, e.g. StandardMaterial, PBRMaterial, PBRMetallicRoughnessMaterial
-     * - Primitives (string, number, boolean) will be applied directly
+     * - Primitives (string, number, boolean, object) will be applied directly
      * - Textures must be objects, with an url parameter and classic Babylon Texture parameters
      *   example : { url : "leather.jpg", uScale : 3, vSCale :3 }
      * - Colors can be an hex string (ex : "#FFFFFF")
@@ -134,8 +140,6 @@ class MaterialManager {
                 }
                 delete params.type;
             }
-
-
             const mat = new BABYLON[type](name, this.scene);
             Object.keys(params).forEach((pK) => {
                 if (pK.includes("Texture")) {
@@ -163,6 +167,7 @@ class MaterialManager {
                     mat[pK] = params[pK];
                 }
                 this.loadedMaterials[name] = mat;
+                self.app.events.emit("load-material", name);
             });
         }
         return this.loadedMaterials[name];
@@ -236,6 +241,86 @@ class MaterialManager {
             delete this.loadedTextures[id];
         }
     }
+
+    /**
+     * show an UI to change the material of the mesh in parameter
+     * display all the material availables in the library
+     * @param {BABYLON.Mesh|string} mesh - the mesh to apply the material to, or its id
+     */
+    showSwitcher(mesh) {
+        if (this.switcherDomElement) {
+            this.switcherDomElement.innerHTML = "";
+        } else {
+            this.switcherDomElement = document.createElement("div");
+        }
+        let meshSwitch = null;
+        if (typeof (mesh) === "string") {
+            meshSwitch = this.scene.meshes.find(m => m.id === mesh);
+        } else {
+            meshSwitch = mesh;
+        }
+        if (!meshSwitch) {
+            throw new Error("Mesh for material switcher not found");
+        }
+        const materialList = document.createElement("ul");
+        const refreshMaterialList = () => {
+            materialList.innerHTML = "";
+            Object.keys(this.loadedMaterials).forEach((matName) => {
+                const matDom = document.createElement("li");
+                matDom.innerHTML = matName;
+                matDom.style.cursor = "pointer";
+                matDom.onmouseover = () => {
+                    matDom.style.color = "#FF00A4";
+                };
+                matDom.onmouseout = () => {
+                    matDom.style.color = "black";
+                };
+                matDom.onclick = () => {
+                    meshSwitch.material = this.loadedMaterials[matName];
+                    self.app.modules.obsidianBabylonEngine.loop();
+                };
+                materialList.appendChild(matDom);
+            });
+        };
+        refreshMaterialList();
+        self.app.events.on("load-material", () => refreshMaterialList());
+        this.switcherDomElement.id = "obsidian-switch-container";
+        this.switcherDomElement.style.width = "200px";
+        this.switcherDomElement.style.position = "fixed";
+        this.switcherDomElement.style.right = "0px";
+        this.switcherDomElement.style.backgroundColor = "#ffffff";
+        this.switcherDomElement.style.opacity = 0.8;
+        const toggleMin = document.createElement("button");
+        const toggleMax = document.createElement("button");
+        toggleMax.style.display = "none";
+        toggleMin.innerHTML = ">>";
+        toggleMin.onclick = () => {
+            this.switcherDomElement.style.width = "15px";
+            toggleMin.style.display = "none";
+            toggleMax.style.display = "block";
+        };
+        toggleMax.innerHTML = "<<";
+        toggleMax.onclick = () => {
+            this.switcherDomElement.style.width = "200px";
+            toggleMax.style.display = "none";
+            toggleMin.style.display = "block";
+        };
+        this.switcherDomElement.appendChild(toggleMin);
+        this.switcherDomElement.appendChild(toggleMax);
+        const title = document.createElement("p");
+        title.innerHTML = "<b>Obsidian Material manager</b>";
+        this.switcherDomElement.appendChild(title);
+        this.switcherDomElement.appendChild(materialList);
+        document.body.appendChild(this.switcherDomElement);
+    }
+
+    hideSwitcher() {
+        if (this.switcherDomElement) {
+            document.body.removeChild(this.switcherDomElement);
+            delete this.switcherDomElement;
+        }
+    }
+
 
 }
 

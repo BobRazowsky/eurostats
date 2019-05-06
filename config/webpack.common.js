@@ -22,6 +22,7 @@ module.exports = {
                 loader: "babel-loader",
                 options: {
                     cacheDirectory: true,
+                    presets: ["@babel/preset-env"],
                 },
             }],
             exclude: path.join(ROOT_DIR, "node_modules"),
