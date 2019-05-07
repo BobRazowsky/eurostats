@@ -43,42 +43,42 @@ module.exports = (plop) => {
 
             let actions = [{
                 type: "add",
-                path: `${defaultPath} + /{{dashCase name}}/index.js`,
+                path: `${defaultPath}/{{dashCase name}}/index.js`,
                 templateFile: "module-templates/index.template.js",
             }, {
                 // License
                 type: "add",
-                path: `${defaultPath} + /{{dashCase name}}/LICENSE`,
+                path: `${defaultPath}/{{dashCase name}}/LICENSE`,
                 templateFile: "module-templates/LICENSE",
             }, {
                 // README
                 type: "add",
-                path: `${defaultPath} + /{{dashCase name}}/README.rst`,
+                path: `${defaultPath}/{{dashCase name}}/README.rst`,
                 templateFile: "module-templates/README.template.rst",
             }, {
                 // Documentation
                 type: "add",
-                path: `${defaultPath} + /{{dashCase name}}/doc/index.rst`,
+                path: `${defaultPath}/{{dashCase name}}/doc/index.rst`,
                 templateFile: "module-templates/doc/index.template.rst",
             }, {
                 type: "add",
-                path: `${defaultPath} + /{{dashCase name}}/src/{{dashCase name}}.js`,
+                path: `${defaultPath}/{{dashCase name}}/src/{{dashCase name}}.js`,
                 templateFile: "module-templates/src/module.template.js",
             }];
             if (data.vue === true && data.inlineVue === true) {
                 actions = actions.concat([{
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/src/{{dashCase name}}.vue`,
+                    path: `${defaultPath}/{{dashCase name}}/src/{{dashCase name}}.vue`,
                     templateFile: "module-templates/src/module-view-inline.template.vue",
                 }]);
             } else if (data.vue === true && data.inlineVue === false) {
                 actions = actions.concat([{
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/src/{{dashCase name}}.vue`,
+                    path: `${defaultPath}/{{dashCase name}}/src/{{dashCase name}}.vue`,
                     templateFile: "module-templates/src/module-view.template.vue",
                 }, {
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/src/{{dashCase name}}.less`,
+                    path: `${defaultPath}/{{dashCase name}}/src/{{dashCase name}}.less`,
                     templateFile: "module-templates/src/module-style.less",
                 }]);
             }
@@ -86,24 +86,24 @@ module.exports = (plop) => {
                 // npm ignore
                 actions = actions.concat([{
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/.npmignore`,
+                    path: `${defaultPath}/{{dashCase name}}/.npmignore`,
                     templateFile: "module-templates/.npmignore",
                 }]);
             } else {
                 // npm ignore
                 actions = actions.concat([{
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/.npmignore`,
+                    path: `${defaultPath}/{{dashCase name}}/.npmignore`,
                     templateFile: "module-templates/.npmignore.test",
                 }, {
                     // test
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/src/{{dashCase name}}.test.js`,
+                    path: `${defaultPath}/{{dashCase name}}/src/{{dashCase name}}.test.js`,
                     templateFile: "module-templates/src/module.template.test.js",
                 }, {
                     // test mock
                     type: "add",
-                    path: `${defaultPath} + /{{dashCase name}}/__mocks__/index.js`,
+                    path: `${defaultPath}/{{dashCase name}}/__mocks__/index.js`,
                     templateFile: "module-templates/__mocks__/index.template.js",
                 }]);
             }
