@@ -19,6 +19,13 @@ npm install
 
 ---
 
+### Auto creating module
+
+```
+npm run plop
+```
+
+
 # obsidian starter
 
 ## Usage
