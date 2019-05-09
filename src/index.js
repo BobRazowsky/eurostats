@@ -1,11 +1,9 @@
 import "@babel/polyfill";
 import obsidian from "@obsidianjs/obsidian";
-
-
+import MainLoop from "@obsidianjs/main-loop";
 import ObsidianBabylonEngine from "obsidian-babylon-engine";
 import Vuejs from "./modules/vuejs";
 import Torus from "./modules/torus";
-import MainLoop from "./modules/main-loop";
 
 
 import "./style/index.less";
