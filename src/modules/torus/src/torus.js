@@ -12,26 +12,40 @@ const Torus = {
      */
     scene: null,
 
+    /**
+     * @type BABYLON.Mesh
+     */
     mesh: null,
 
     test: "test",
 
-    materialManager: self.app.modules.materialManager,
+    /**
+     * @type ObsidianMaterialManager
+     */
+    materialManager: self.app.modules.obsidianMaterialManager,
 
+    /**
+     * @type ObsidianBabylonEngine
+     */
+    engine: self.app.modules.obsidianBabylonEngine,
+
+    /**
+     * Wait for the obsidian engine initialization
+     * then launch the torus creation
+     */
     Init() {
-        if (self.app.modules.obsidianBabylonEngine.isReady) {
+
+        Torus.engine.waitForLoading().then(() => {
+            Torus.scene = Torus.engine.scene;
+            Torus.materialManager.init(Torus.scene);
             Torus.CreateTorus();
-        } else {
-            self.app.events.on("@material-manager.ready", () => {
-                Torus.CreateTorus();
-            });
-        }
+        });
+
     },
 
     CreateTorus() {
-        Torus.scene = self.app.modules.obsidianBabylonEngine.scene;
 
-        // The torus and its material
+        // The torus mesh
         const torus = BABYLON.MeshBuilder.CreateTorus(
             "torus", {
                 thickness: 0.5,
@@ -39,32 +53,32 @@ const Torus = {
             },
             Torus.scene
         );
-        const torusMaterial = new BABYLON.StandardMaterial("torusMaterial", Torus.scene);
-        torus.material = torusMaterial;
-
-        // // Torus update
-        // Torus.scene.registerBeforeRender(() => {
-        //     // Color change
-        //     const now = Date.now();
-        //     torus.material.diffuseColor.r = (Math.sin(now * 0.0002)) ** 2;
-        //     torus.material.diffuseColor.g = (Math.cos(now * 0.0007)) ** 2;
-        //     torus.material.diffuseColor.b = (Math.cos(now * 0.0001)) ** 4;
-
-        //     // Rotation change
-        //     const ratio = Torus.scene.getAnimationRatio();
-        //     torus.rotate(BABYLON.Vector3.Left(), 0.01 * ratio);
-        //     torus.rotate(BABYLON.Vector3.Up(), 0.01 * ratio);
-        // });
-
+        torus.rotationQuaternion = BABYLON.Quaternion.Identity();
         Torus.mesh = torus;
-        /** @type BABYLON.Scene  */
 
+        // Load material from the json config file
+        Torus.materialManager.loadMaterialsFromJSON("assets/modules/material-library/materials.json").then(() => {
 
-        self.app.modules.materialManager.loadMaterialsFromJSON("assets/modules/material-library/materials.json").then(() => {
             torus.material = Torus.materialManager.getMaterials().inox;
+
+            // Torus color and rotation update
+            Torus.scene.registerBeforeRender(() => {
+                const now = Date.now();
+                torus.material.albedoColor.r = (Math.sin(now * 0.0002)) ** 2;
+                torus.material.albedoColor.g = (Math.cos(now * 0.0007)) ** 2;
+                torus.material.albedoColor.b = (Math.cos(now * 0.0001)) ** 4;
+
+                const ratio = Torus.scene.getAnimationRatio();
+                torus.rotate(BABYLON.Vector3.Left(), 0.01 * ratio);
+                torus.rotate(BABYLON.Vector3.Up(), 0.01 * ratio);
+            });
+
+            self.app.events.emit("ready");
         });
 
         // });
+
+        // Ready events, listened by the view
     },
 
 

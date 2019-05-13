@@ -1,12 +1,12 @@
 import "@babel/polyfill";
-import obsidian from "@obsidianjs/obsidian";
-import httpRequest from "@obsidianjs/http-request";
 
+import httpRequest from "@obsidianjs/http-request";
+import obsidian from "@obsidianjs/obsidian";
+import MainLoop from "@obsidianjs/main-loop";
 import ObsidianBabylonEngine from "obsidian-babylon-engine";
+import ObsidianMaterialManager from "obsidian-material-manager";
 import Vuejs from "./modules/vuejs";
 import Torus from "./modules/torus";
-import MainLoop from "./modules/main-loop";
-import MaterialManager from "./modules/material-manager";
 
 import "./style/index.less";
 
@@ -24,7 +24,7 @@ app.use(ObsidianBabylonEngine, {
         autostart: false,
     },
 });
-app.use(MaterialManager, {
+app.use(ObsidianMaterialManager, {
     config: {
         texturePath: "/assets/modules/material-library/",
         debug: true,

@@ -1,20 +1,25 @@
+<!-- Main Vue for the obsidian app -->
+
 <template>
+<!-- HTML template -->
 	<div id="app">
+		<!-- Contains the main menu (on the left ) -->
         <main-menu></main-menu>
+
+		<!-- And the canvas, where the BabylonJs Scene is rendered -->
         <main-canvas></main-canvas>
     </div>
 </template>
 
 
-
-
 <script>
-import Vue from 'vue';
+// Js Part
+
+// Vue components
 import MainMenu from './main-menu.vue';
 import MainCanvas from './main-canvas.vue';
 
-//import Button from './components/Button'
-
+// Minimal export
 export default {
     name: 'app',
     components: {
@@ -22,14 +27,10 @@ export default {
         "main-canvas": MainCanvas
     },
     created: function(){
-        console.log("COUCOU c'est moi l'app", this.meshManager);
+        console.log("Hey, it's me, the main vue for your Obsidian app", this.meshManager);
     },
-    methods: {
-        onClick() {
-
-        }
-    }
   }
 </script>
 
+<!-- the style can be in an other file like here, or directely in the .vue file -->
 <style src="./app.less"></style>

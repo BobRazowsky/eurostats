@@ -1,4 +1,5 @@
 <template>
+<!-- canvas template -->
     <div id="canvas-container">
         <canvas id="main-canvas"></canvas>
     </div>
@@ -6,21 +7,17 @@
 
 
 <script>
+// We start the BabylonJs engine once the canvas html is builted (=> mounted function)
 import self from "../../index";
-
-
     export default {
         name: 'main-canvas',
         mounted(){
             self.app.modules.obsidianBabylonEngine.start();
         },
-        data () {
-            return {
-            }
-        }
     }
 </script>
 
+<!-- Basic style -->
 <style lang="less">
     #main-canvas {
         touch-action: none;

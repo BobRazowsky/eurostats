@@ -9,7 +9,8 @@
     "release": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.release.js && cp -r server build/release && cp package.json build/release",
     "lint": "eslint src config server jast.js",
     "lint-fix": "eslint src config server jast.js --fix",
-    "test": "echo \"tests: todo !\""
+    "test": "echo \"tests: todo !\"",
+    "plop": "plop"
   },
   "husky": {
     "hooks": {
@@ -31,7 +32,7 @@
     "@babel/preset-env": "^7.4.4",
     "@obsidianjs/obsidian": "^0.1.2",
     "autoprefixer": "^9.5.1",
-    "babel-loader": "^8.0.4",
+    "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^1.0.0",
     "compression-webpack-plugin": "^2.0.0",
     "copy-webpack-plugin": "^4.5.1",
@@ -50,6 +51,7 @@
     "license-webpack-plugin": "^2.1.1",
     "lint-staged": "^8.1.6",
     "mini-css-extract-plugin": "^0.5.0",
+    "plop": "^2.3.0",
     "postcss-loader": "^3.0.0",
     "progress-bar-webpack-plugin": "^1.12.1",
     "style-loader": "^0.23.1",
@@ -61,7 +63,7 @@
     "vue-loader": "^15.6.4",
     "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.7",
-    "webpack": "^4.30.0",
+    "webpack": "^4.31.0",
     "webpack-cli": "^3.3.2",
     "webpack-dev-middleware": "^3.6.2",
     "webpack-glsl-loader": "^1.0.1",
@@ -69,7 +71,9 @@
   },
   "dependencies": {
     "@obsidianjs/http-request": "^0.1.4",
+    "@obsidianjs/main-loop": "^0.1.1",
     "express": "^4.16.3",
-    "obsidian-babylon-engine": "git+ssh://git@git.wanadev.org:obsidian/obsidian-engine-babylonjs.git"
+    "obsidian-babylon-engine": "git+ssh://git@git.wanadev.org:obsidian/obsidian-engine-babylonjs.git",
+    "obsidian-material-manager": "git+ssh://git@git.wanadev.org:ldemicheli/obsidian-material-manager.git"
   }
 }

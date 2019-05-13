@@ -1,6 +1,6 @@
 export default {
     name: "torus",
-    requires: ["obsidian-babylon-engine", "material-manager"],
+    requires: ["obsidian-babylon-engine", "obsidian-material-manager"],
     load() {
         const Torus = require("./src/torus").default;
         Torus.Init();
