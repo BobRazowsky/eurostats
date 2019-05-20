@@ -11,7 +11,7 @@ import self from "../../index";
 
 export default {
     name: 'main-menu',
-    components: { // We displau the torus view
+    components: { // We display the torus view
         "torus-menu": self.app.modules.torus.view
     },
     methods: {

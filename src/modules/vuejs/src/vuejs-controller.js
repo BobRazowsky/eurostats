@@ -1,5 +1,5 @@
 import Vue from "vue";
-import App from "./templates/app.vue";
+import App from "./components/app.vue";
 
 /**
  * Instanciate the main Vue, on the app element
