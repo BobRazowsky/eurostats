@@ -3,7 +3,6 @@
 <!-- And its rotation parameters -->
 <template>
     <div id="torus">
-        
 		<div v-if="color">
 			<span class = "torus-title">Couleurs</span>
         	<br>r : {{round3(color.r)}}
