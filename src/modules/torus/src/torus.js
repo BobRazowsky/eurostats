@@ -1,6 +1,5 @@
-import * as BABYLON from "@babylonjs/core/Legacy/legacy";
 import self from "../index";
-
+import BABYLON from "./babylon-modules";
 
 /**
  * Simple Torus with changing color and orientation
@@ -30,7 +29,7 @@ const Torus = {
 
         Torus.engine.waitForLoading().then(() => {
             Torus.scene = Torus.engine.scene;
-            Torus.materialManager.init(Torus.scene);
+            Torus.materialManager.init(Torus.scene, BABYLON);
             Torus.CreateTorus();
         });
 

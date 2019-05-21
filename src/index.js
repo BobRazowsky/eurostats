@@ -20,6 +20,8 @@ app.use(MainLoop, {
 });
 app.use(ObsidianBabylonEngine, {
     config: {
+        exampleCamera: true,
+        exampleLight: true,
         canvasId: "main-canvas",
         autostart: false,
     },
