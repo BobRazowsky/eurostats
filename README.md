@@ -1,10 +1,17 @@
 # Notice :
 
-This is a fork of https://git.wanadev.org/obsidian/starter with a babylonjs 3D scene and vueJs.  
-It uses the **[obsidian-babylon-engine](https://git.wanadev.org/obsidian/obsidian-engine-babylonjs)** and **[obsidian-material-manager](https://git.wanadev.org/ldemicheli/obsidian-material-manager)** modules.
+This is a fork of https://github.com/wanadev/obsidianjs-starter adding Wanadev
+specific (private) configuration for deployment & caas.
 
-Upstream repository url: `git@git.wanadev.org:obsidian/starter.git`
+Please do not submit merge requests or open issues here if not linked to Wanadev
+infrastructure.
 
+
+Upstream repository url: `git@github.com:wanadev/obsidianjs-starter.git`
+
+```
+npm install
+```
 ---
 
 ## Useful links :
@@ -12,6 +19,13 @@ Upstream repository url: `git@git.wanadev.org:obsidian/starter.git`
 * [Automatic deployment of an Obsdian app with Google Cloud (App Engine) and JAST](https://git.wanadev.org/obsidian/starter/wikis/D%C3%A9ploiement-Google-Cloud)
 
 ---
+
+### Auto creating module
+
+```
+npm run plop
+```
+
 
 # obsidian starter
 
