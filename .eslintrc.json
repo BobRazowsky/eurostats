@@ -1,6 +1,9 @@
 {
   "root": true,
-  "extends": "airbnb-base",
+  "extends":[
+      "airbnb-base",
+      "plugin:vue/recommended"
+  ],
   "env": {
     "es6": true,
     "browser": true,
@@ -10,6 +13,8 @@
   "rules": {
     "quotes": ["error", "double"],
     "indent": ["error", 4],
+    "no-underscore-dangle": "off",
+    "no-plusplus": "off",
     "padded-blocks": [
       "error",
       {
@@ -34,17 +39,26 @@
         "functions": "ignore"
       }
     ],
-    "no-param-reassign": ["error", { "props": false }],
-    "global-require": "off"
+    "no-param-reassign": ["error", {
+      "props": false
+    }],
+    "global-require": "off",
+    "object-shorthand": "off",
+    "vue/html-indent": [
+        "error",
+        4
+    ],
+    "vue/name-property-casing": [
+        "error",
+        "kebab-case"
+    ]
   },
-  "overrides": [
-    {
-      "files": ["*.test.js"],
-      "env": {
-        "jest": true
-      }
+  "overrides": [{
+    "files": ["*.test.js"],
+    "env": {
+      "jest": true
     }
-  ],
+  }],
   "settings": {
     "import/resolver": {
       "webpack": {
