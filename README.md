@@ -5,11 +5,7 @@ specific (private) configuration for deployment & caas.
 
 Please do not submit merge requests or open issues here if not linked to Wanadev
 infrastructure.
-<<<<<<< HEAD
 
-Upstream repository url: `git@github.com:wanadev/obsidianjs-starter.git`
-=======
->>>>>>> parent of 577a636... es6 modules and readme update
 
 Upstream repository url: `git@github.com:wanadev/obsidianjs-starter.git`
 
