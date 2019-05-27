@@ -4,10 +4,6 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-// Vue Config
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
-
-
 const ROOT_DIR = path.resolve(__dirname, "../");
 
 module.exports = {
@@ -16,55 +12,49 @@ module.exports = {
     },
     target: "web",
     module: {
-        rules: [{
-            test: /\.(js|jsx)$/,
-            use: [{
-                loader: "babel-loader",
-                options: {
-                    cacheDirectory: true,
-                    presets: ["@babel/preset-env"],
-                },
-            }],
-            exclude: path.join(ROOT_DIR, "node_modules"),
-        },
-        {
-            test: /\.css$/,
-            use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
-        },
-        {
-            test: /\.less$/,
-            use: [MiniCssExtractPlugin.loader, "css-loader", "less-loader", "postcss-loader"],
-        },
-        {
-            test: /\.glsl$/,
-            use: [{
-                loader: "webpack-glsl-loader",
-            }],
-        },
-        {
-            test: /\.vue$/,
-            use: [{
-                loader: "vue-loader",
-            }],
-            exclude: path.join(ROOT_DIR, "node_modules"),
-        },
+        rules: [
+            {
+                test: /\.(js|jsx)$/,
+                use: [
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            cacheDirectory: true,
+                        },
+                    },
+                ],
+                exclude: path.join(ROOT_DIR, "node_modules"),
+            },
+            {
+                test: /\.css$/,
+                use: [MiniCssExtractPlugin.loader, "css-loader", "postcss-loader"],
+            },
+            {
+                test: /\.less$/,
+                use: [MiniCssExtractPlugin.loader, "css-loader", "less-loader", "postcss-loader"],
+            },
+            {
+                test: /\.glsl$/,
+                use: [
+                    {
+                        loader: "webpack-glsl-loader",
+                    },
+                ],
+            },
         ],
     },
     plugins: [
         new MiniCssExtractPlugin({
             filename: "style/[name].[chunkhash].bundle.css",
         }),
-        new CopyWebpackPlugin([{
-            from: "**/*",
-            to: "assets",
-            context: "src/assets",
-        },
-        {
-            from: "*/assets/**/*",
-            to: "assets/modules/[1]/[2]",
-            test: /.*src[\\/]modules[\\/]([^\\/]*)[\\/]assets[\\/](.+)$/,
-            context: "src/modules",
-        },
+        new CopyWebpackPlugin([
+            { from: "**/*", to: "assets", context: "src/assets" },
+            {
+                from: "*/assets/**/*",
+                to: "assets/modules/[1]/[2]",
+                test: /.*src[\\/]modules[\\/]([^\\/]*)[\\/]assets[\\/](.+)$/,
+                context: "src/modules",
+            },
         ]),
         new HtmlWebpackPlugin({
             template: "src/index.html",
@@ -72,15 +62,5 @@ module.exports = {
             sourceMap: true,
             chunksSortMode: "dependency",
         }),
-
-        // VueJs !
-        new VueLoaderPlugin(),
     ],
-
-    resolve: {
-        alias: {
-            vue: "vue/dist/vue.js",
-            src: path.resolve("src"),
-        },
-    },
 };
