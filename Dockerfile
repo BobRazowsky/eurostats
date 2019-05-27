@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:8
 
 ENV NODE_ENV caas
 ENV PORT 8080
