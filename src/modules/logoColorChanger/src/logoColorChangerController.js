@@ -7,11 +7,12 @@ function randomBetween(min, max) {
 export default class LogoColorChangerController {
 
     constructor() {
+        console.log("test !");
         this.changeColor();
     }
 
     changeColor() {
-        self.app.modules.logo.setColor(`hsl(${randomBetween(0, 360)}, 100%, 40%)`);
+        self.app.modules.logo.setColor(`hsl(${randomBetween(0, 150)}, 100%, 40%)`);
         setTimeout(() => this.changeColor(), randomBetween(5000, 15000));
     }
 
