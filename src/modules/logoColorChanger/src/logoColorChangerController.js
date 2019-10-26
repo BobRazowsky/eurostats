@@ -8,7 +8,7 @@ export default class LogoColorChangerController {
 
     constructor() {
         console.log("test !");
-        this.changeColor();
+        //this.changeColor();
     }
 
     changeColor() {
