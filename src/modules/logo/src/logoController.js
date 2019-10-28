@@ -1,15 +1,19 @@
 import Chart from 'chart.js';
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 export default class LogoController {
 
     constructor() {
         let results = [];
         let tirageNbOnly = [];
-        
+
+        this.scrap();
+
         this.lastTirage = [];
         this.lastStars = [];
         this.allData = null;
-        this.getJSON("assets/data/results.json", (data) => {
+        this.getJSON("assets/data/euromillions.json", (data) => {
             this.allData = data;
             for (let i = 0; i < data.length; i++) {
                 let stars = [];
@@ -37,9 +41,20 @@ export default class LogoController {
             this.nbDraws = results.length;
             //this.buildInfos(results.length);
             this.buildData(results);
-            this.buildLastDraw(results[0]);
+            this.buildLastDraw(results[0], this.allData[0]);
             this.findSimilarity(tirageNbOnly);
         });
+    }
+
+    scrap() {
+        const url = "https://news.ycombinator.com";
+        axios.get(url)
+            .then(response => {
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
 
     getJSON(url, callback) {
@@ -125,7 +140,12 @@ export default class LogoController {
                 scales: {
                     yAxes: [{
                         ticks: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            //fontColor: this.getFontColor(nbData, 'numbers')
                         }
                     }]
                 }
@@ -163,7 +183,13 @@ export default class LogoController {
         infoContainer.innerHTML = length;
     }
 
-    buildLastDraw(lastDraw) {
+    buildLastDraw(lastDraw, data) {
+
+        console.log("DATAAAA", data)
+
+        let label = document.getElementById("lastDrawLabel");
+        label.innerHTML = label.innerHTML + " - " + data.jour_de_tirage + " " + data.date_de_tirage;
+
         let container = document.getElementById("draw");
         console.log(lastDraw);
 
@@ -210,6 +236,34 @@ export default class LogoController {
         return colors;
     }
 
+    /*getFontColor(data, type) {
+        let colors = [];
+
+        for(var nb in data) {
+            if(type == "numbers") {
+                let color = 'rgba(0, 0, 0, 1)';
+                for (let j = 0; j < this.lastTirage.length; j++) {
+                    if(nb == this.lastTirage[j]) {
+                        console.log(this.lastTirage);
+                        color = 'rgba(255, 255, 255, 1)';
+                    }
+                }
+                colors.push(color);
+            } else if(type == "stars") {
+                let color = 'rgba(0, 0, 0, 1)';
+                for (let j = 0; j < this.lastStars.length; j++) {
+                    if(nb == this.lastStars[j]) {
+                        console.log(this.lastStars);
+                        color = 'rgba(255, 255, 255, 1)';
+                    }
+                }
+                colors.push(color);
+            }
+        }
+
+        return colors;
+    }*/
+
     getBorderColor(data, type) {
         let borderColors = [];
 
@@ -218,7 +272,7 @@ export default class LogoController {
                 let color = undefined;
                 for (let j = 0; j < this.lastTirage.length; j++) {
                     if(nb == this.lastTirage[j]) {
-                        color = 'rgba(0, 0, 0, 1)';
+                        color = 'rgba(246, 141, 32, 1)';
                     }
                 }
                 borderColors.push(color);
@@ -226,14 +280,14 @@ export default class LogoController {
                 let color = undefined;
                 for (let j = 0; j < this.lastStars.length; j++) {
                     if(nb == this.lastStars[j]) {
-                        color = 'rgba(0, 0, 0, 1)';
+                        color = 'rgba(86, 105, 154, 1)';
                     }
                 }
                 borderColors.push(color);
             }
         }
 
-        return borderColors;     
+        return borderColors;
     }
 
     getBorderWidth(data, type) {
@@ -259,7 +313,7 @@ export default class LogoController {
             }
         }
 
-        return borderWidths;     
+        return borderWidths;
     }
 
 }
