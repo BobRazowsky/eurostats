@@ -1,14 +1,16 @@
 import "@babel/polyfill";
 import obsidian from "@obsidianjs/obsidian";
 
-import logoModule from "./modules/logo";
-import logoColorChangerModule from "./modules/logoColorChanger";
+import stats from "./modules/stats";
+import ui from "./modules/ui";
+import vuejs from "./modules/vuejs";
 
 import "./style/index.less";
 
 const app = obsidian("starter-app");
 
-app.use(logoModule);
-app.use(logoColorChangerModule);
+app.use(ui);
+app.use(stats);
+app.use(vuejs);
 
 app.start();
