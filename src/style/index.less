@@ -6,13 +6,32 @@ html, body {
 }
 
 body {
-    background-color: #fff;
+    background-color: #e4e4e4;
     font-family: sans-serif;
+    display: flex;
+}
+
+#nav {
+    width: 200px;
+    height: 100%;
+    background-color: #243f85;
+
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    a {
+        color: white;
+        text-decoration: none;
+    }
 }
 
 #main {
     width: 100%;
     display: flex;
+    flex-direction: column;
     padding: 20px;
 
     #infos {
@@ -34,8 +53,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 400px;
-    margin-left: 20px;
+    width: 100%;
+    background-color: orange;
+    height: 120px;
 
     #draw {
         display: flex;
